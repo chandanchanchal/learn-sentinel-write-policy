@@ -1,0 +1,32 @@
+import "aws-functions" as aws
+import "tfplan-functions" plan
+
+#Below are list of resources tht we required to have name/value tags
+param resouce_types default [
+  "aws_instance",
+  "aws_s3_bucket",
+  
+  ]
+# tags which must be there with the resources 
+param manadatory_tags default [
+   "Name",
+   "owner",
+  ]
+  
+allowed_zones = [
+  "us-east-1a",
+  "us-east-1b",
+  "us-east-1c",
+]  
+  
+#allAWSResourceWithStandardTags = aws.find_resources_with_standard_tags(resouce_types)
+allEC2Instances = plan.find_resources("aws_instance#")
+
+#ruleBreaker =  plan.filter_attribute_not_contains_list(allAWSResourceWithStandardTags,"tags",manadatory_tags,true)
+ruleBreakerforallEC2Instances =  plan.filter_attribute_not_in_list(allEC2Instances,"availability_zon",allowed_zones,true)
+
+# Add Main rule
+ main = rule{
+ # use ruleBreaker to get info
+ #ruleBreakerforallEC2Instances
+ }
